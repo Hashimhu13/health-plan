@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الخطة الصحية اليومية</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <section class="personal-info">
+            <h2>البيانات الشخصية</h2>
+            <form id="personal-form">
+                <label for="username">الاسم:</label>
+                <input type="text" id="username" name="username" required>
+                <br>
+                <label for="birthdate">تاريخ الميلاد:</label>
+                <input type="date" id="birthdate" name="birthdate" required>
+                <br>
+                <label for="work-start">بداية الدوام:</label>
+                <input type="time" id="work-start" name="work-start" required>
+                <label for="work-end">نهاية الدوام:</label>
+                <input type="time" id="work-end" name="work-end" required>
+                <br>
+                <label>أيام العمل:</label>
+                <span class="days-checkboxes">
+                    <label><input type="checkbox" name="workdays" value="السبت"> سبت</label>
+                    <label><input type="checkbox" name="workdays" value="الأحد"> أحد</label>
+                    <label><input type="checkbox" name="workdays" value="الاثنين"> اثنين</label>
+                    <label><input type="checkbox" name="workdays" value="الثلاثاء"> ثلاثاء</label>
+                    <label><input type="checkbox" name="workdays" value="الأربعاء"> أربعاء</label>
+                    <label><input type="checkbox" name="workdays" value="الخميس"> خميس</label>
+                    <label><input type="checkbox" name="workdays" value="الجمعة"> جمعة</label>
+                </span>
+                <br>
+                <button type="submit">حفظ البيانات</button>
+            </form>
+            <div id="personal-summary"></div>
+            <button id="edit-personal-btn" style="display:none;margin-top:8px;">تعديل البيانات</button>
+        </section>
+        <header>
+            <h1>الخطة الصحية اليومية</h1>
+        </header>
+        <section class="plan">
+            <h2>الجدول اليومي</h2>
+            <div id="today-progress" style="margin-bottom:10px;"></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الوقت</th>
+                        <th>النشاط</th>
+                        <th>تم الإنجاز؟</th>
+                    </tr>
+                </thead>
+                <tbody id="plan-table">
+                    <!-- سيتم تعبئتها عبر جافاسكريبت -->
+                </tbody>
+            </table>
+        </section>
+        <section class="notes">
+            <h2>ملاحظات إضافية</h2>
+            <ul>
+                <li>الرياضة بعد الدوام تساعد على استهلاك السعرات الحرارية بعد يوم طويل من الجلوس.</li>
+                <li>المراقبة: سجل وزنك مرتين بالأسبوع + أي ملاحظات عن شعورك أو طاقتك.</li>
+                <li>التدرج: إذا شعرت بالتعب في البداية، يمكن البدء بمشي 20 دقيقة ثم زيادة المدة.</li>
+                <li>الترطيب: شرب الماء كثيرًا خلال فترة الصيام لتقليل الجوع ودعم الجسم.</li>
+            </ul>
+        </section>
+        <section class="progress">
+            <h2>تتبع الالتزام الأسبوعي</h2>
+            <div id="weekly-progress">
+                <!-- سيتم عرض النتائج هنا -->
+            </div>
+        </section>
+        <section class="daily-log">
+            <h2>سجل الوزن والملاحظات اليومية</h2>
+            <form id="log-form">
+                <label for="weight">الوزن (كجم):</label>
+                <input type="number" id="weight" name="weight" step="0.1" min="0" required>
+                <br>
+                <label for="note">ملاحظة:</label>
+                <input type="text" id="note" name="note" maxlength="100">
+                <br>
+                <button type="submit">حفظ</button>
+            </form>
+            <div id="log-history"></div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
