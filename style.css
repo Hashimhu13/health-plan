@@ -1,0 +1,157 @@
+body {
+    font-family: 'Cairo', Arial, sans-serif;
+    background: #f7f7fa;
+    margin: 0;
+    direction: rtl;
+    display: flex;
+}
+.sidebar {
+    width: 200px;
+    background: #1976d2;
+    min-height: 100vh;
+    color: #fff;
+    box-shadow: 2px 0 8px #0001;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 10;
+}
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.sidebar li {
+    margin: 0;
+}
+.sidebar-link {
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    padding: 18px 24px;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #1565c0;
+    transition: background 0.2s;
+}
+.sidebar-link.active, .sidebar-link:hover {
+    background: #1565c0;
+}
+.container {
+    max-width: 700px;
+    margin: 30px 220px 30px 30px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #0001;
+    padding: 24px 20px;
+    min-height: 80vh;
+}
+.section {
+    display: none;
+}
+.section.active {
+    display: block;
+}
+section.home-section {
+    background: #e3f2fd;
+    border-radius: 10px;
+    padding: 16px 12px 10px 12px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 4px #0001;
+}
+section.personal-info {
+    background: #e3f2fd;
+    border-radius: 10px;
+    padding: 16px 12px 10px 12px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 4px #0001;
+}
+section.personal-info h2 {
+    margin-top: 0;
+    color: #1976d2;
+}
+#personal-form label {
+    margin-left: 6px;
+    font-weight: bold;
+}
+#personal-form input[type="text"],
+#personal-form input[type="date"],
+#personal-form input[type="time"] {
+    margin: 4px 0 8px 0;
+    padding: 4px 8px;
+    border-radius: 5px;
+    border: 1px solid #bdbdbd;
+    font-size: 1rem;
+}
+.days-checkboxes label {
+    margin-left: 8px;
+    font-weight: normal;
+}
+#personal-form button {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 18px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 8px;
+}
+#personal-summary {
+    margin-top: 10px;
+    color: #0d47a1;
+    font-size: 1.1rem;
+}
+header {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 18px;
+}
+header h1 {
+    margin: 0 0 10px 0;
+    color: #2a7b6f;
+    font-size: 2rem;
+}
+.user-info p {
+    margin: 0 0 4px 0;
+    color: #444;
+    font-size: 1rem;
+}
+.plan h2, .notes h2, .progress h2 {
+    color: #2a7b6f;
+    margin-top: 0;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px 6px;
+    text-align: center;
+}
+th {
+    background: #e0f7fa;
+    color: #00695c;
+}
+tr:nth-child(even) {
+    background: #f1f1f1;
+}
+.notes ul {
+    padding-right: 18px;
+    color: #333;
+}
+.progress {
+    margin-top: 24px;
+    background: #f0f4c3;
+    border-radius: 8px;
+    padding: 12px 10px;
+}
+#weekly-progress {
+    font-size: 1.1rem;
+    color: #33691e;
+    margin-top: 8px;
+}
+input[type="checkbox"] {
+    transform: scale(1.2);
+    accent-color: #2a7b6f;
+}
