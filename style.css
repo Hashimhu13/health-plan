@@ -3,14 +3,60 @@ body {
     background: #f7f7fa;
     margin: 0;
     direction: rtl;
+    display: flex;
+}
+.sidebar {
+    width: 200px;
+    background: #1976d2;
+    min-height: 100vh;
+    color: #fff;
+    box-shadow: 2px 0 8px #0001;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 10;
+}
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.sidebar li {
+    margin: 0;
+}
+.sidebar-link {
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    padding: 18px 24px;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #1565c0;
+    transition: background 0.2s;
+}
+.sidebar-link.active, .sidebar-link:hover {
+    background: #1565c0;
 }
 .container {
     max-width: 700px;
-    margin: 30px auto;
+    margin: 30px 220px 30px 30px;
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 2px 8px #0001;
     padding: 24px 20px;
+    min-height: 80vh;
+}
+.section {
+    display: none;
+}
+.section.active {
+    display: block;
+}
+section.home-section {
+    background: #e3f2fd;
+    border-radius: 10px;
+    padding: 16px 12px 10px 12px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 4px #0001;
 }
 section.personal-info {
     background: #e3f2fd;

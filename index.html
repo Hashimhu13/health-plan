@@ -3,12 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الخطة الصحية اليومية</title>
+    <title>تطبيق الصحة اليومي</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="sidebar">
+        <ul>
+            <li><a href="#" data-section="home" class="sidebar-link active">الرئيسية</a></li>
+            <li><a href="#" data-section="plan" class="sidebar-link">الجدول اليومي</a></li>
+            <li><a href="#" data-section="meals" class="sidebar-link">الوجبات والسعرات</a></li>
+            <li><a href="#" data-section="progress" class="sidebar-link">تتبع الالتزام</a></li>
+            <li><a href="#" data-section="log" class="sidebar-link">سجل الوزن والملاحظات</a></li>
+            <li><a href="#" data-section="personal" class="sidebar-link">البيانات الشخصية</a></li>
+        </ul>
+    </div>
     <div class="container">
-        <section class="personal-info">
+    <section class="home-section section" id="section-home">
+            <div id="home-greeting" style="font-size:1.3rem;margin-bottom:8px;"></div>
+            <div id="home-motivation" style="font-size:1.1rem;color:#1976d2;margin-bottom:12px;"></div>
+            <h2>ملخص اليوم</h2>
+            <div id="home-summary"></div>
+            <div style="max-width:340px;margin:18px auto 0 auto;">
+                <canvas id="home-circle-chart"></canvas>
+            </div>
+            <div id="home-plan-table" style="margin-top:18px;"></div>
+            <section class="meals" id="home-meals-section">
+                <h2>تسجيل الوجبات اليومية والسعرات</h2>
+                <form id="meal-form">
+                    <label for="meal-name">اسم الوجبة:</label>
+                    <select id="meal-name" name="meal-name" required>
+                        <option value="افطار">افطار</option>
+                        <option value="غداء">غداء</option>
+                        <option value="عشاء">عشاء</option>
+                        <option value="سناك">سناك</option>
+                    </select>
+                    <label for="food-type">نوع الطعام:</label>
+                    <select id="food-type" name="food-type" required></select>
+                    <label for="food-amount">الكمية (جم أو وحدة):</label>
+                    <input type="number" id="food-amount" name="food-amount" min="1" required>
+                    <span id="food-unit"></span>
+                    <label for="meal-calories">السعرات (يحسب تلقائياً):</label>
+                    <input type="number" id="meal-calories" name="meal-calories" min="0" readonly>
+                    <button type="submit">إضافة</button>
+                </form>
+                <div id="meals-list"></div>
+                <div id="meals-total" style="margin-top:8px;font-weight:bold;"></div>
+            </section>
+        </section>
+        <section class="personal-info section" id="section-personal">
             <h2>البيانات الشخصية</h2>
             <form id="personal-form">
                 <label for="username">الاسم:</label>
@@ -38,12 +80,67 @@
             <div id="personal-summary"></div>
             <button id="edit-personal-btn" style="display:none;margin-top:8px;">تعديل البيانات</button>
         </section>
-        <header>
-            <h1>الخطة الصحية اليومية</h1>
-        </header>
-        <section class="plan">
+    <!-- تم حذف عنوان الخطة الصحية اليومية بناءً على طلب المستخدم -->
+        <section class="plan section" id="section-plan">
             <h2>الجدول اليومي</h2>
+            <form id="plan-form" style="margin-bottom:12px;">
+                <label>النشاط:</label>
+                <input type="text" id="plan-activity" required style="width:180px;">
+                <label>من:</label>
+                <input type="time" id="plan-start" required style="width:90px;">
+                <label>إلى:</label>
+                <input type="time" id="plan-end" required style="width:90px;">
+                <button type="submit">إضافة</button>
+            </form>
             <div id="today-progress" style="margin-bottom:10px;"></div>
+            <div id="plan-table-wrap"></div>
+        </section>
+        <section class="meals section" id="section-meals">
+                <h2>تسجيل الوجبات اليومية والسعرات</h2>
+                <form id="meal-form">
+                    <label for="meal-name">اسم الوجبة:</label>
+                    <select id="meal-name" name="meal-name" required>
+                        <option value="افطار">افطار</option>
+                        <option value="غداء">غداء</option>
+                        <option value="عشاء">عشاء</option>
+                        <option value="سناك">سناك</option>
+                    </select>
+                    <label for="food-type">نوع الطعام:</label>
+                    <select id="food-type" name="food-type" required></select>
+                    <label for="food-amount">الكمية (جم أو وحدة):</label>
+                    <input type="number" id="food-amount" name="food-amount" min="1" required>
+                    <span id="food-unit"></span>
+                    <label for="meal-calories">السعرات (يحسب تلقائياً):</label>
+                    <input type="number" id="meal-calories" name="meal-calories" min="0" readonly>
+                    <button type="submit">إضافة</button>
+                </form>
+                <div id="meals-list"></div>
+                <div id="meals-total" style="margin-top:8px;font-weight:bold;"></div>
+                <hr>
+                <h3>إضافة نوع طعام جديد</h3>
+                <form id="food-form">
+                    <label for="new-food-name">اسم الطعام:</label>
+                    <input type="text" id="new-food-name" name="new-food-name" required>
+                    <label for="new-food-calories">سعرات لكل <span id="unit-label">100 جم</span>:</label>
+                    <input type="number" id="new-food-calories" name="new-food-calories" min="1" required>
+                    <label for="new-food-unit-type">نوع الكمية:</label>
+                    <select id="new-food-unit-type" name="new-food-unit-type">
+                        <option value="جم">جم</option>
+                        <option value="حبة">حبة</option>
+                        <option value="ساندويتش">ساندويتش</option>
+                        <option value="وجبة">وجبة</option>
+                        <option value="كوب">كوب</option>
+                        <option value="مل">مل</option>
+                        <option value="قطعة">قطعة</option>
+                        <option value="وجبة (4 قطع)">وجبة (4 قطع)</option>
+                    </select>
+                    <label for="new-food-unit-amount">عدد الجرامات أو الحبات في الوحدة:</label>
+                    <input type="number" id="new-food-unit-amount" name="new-food-unit-amount" min="1" value="100" required style="width:70px">
+                    <button type="submit">إضافة للطعام</button>
+                    <button type="button" id="cancel-edit-food" style="display:none;">إلغاء التعديل</button>
+                </form>
+                <div id="food-list"></div>
+            </section>
             <table>
                 <thead>
                     <tr>
@@ -66,13 +163,13 @@
                 <li>الترطيب: شرب الماء كثيرًا خلال فترة الصيام لتقليل الجوع ودعم الجسم.</li>
             </ul>
         </section>
-        <section class="progress">
+    <section class="progress section" id="section-progress">
             <h2>تتبع الالتزام الأسبوعي</h2>
             <div id="weekly-progress">
                 <!-- سيتم عرض النتائج هنا -->
             </div>
         </section>
-        <section class="daily-log">
+        <section class="daily-log section" id="section-log">
             <h2>سجل الوزن والملاحظات اليومية</h2>
             <form id="log-form">
                 <label for="weight">الوزن (كجم):</label>
@@ -86,6 +183,7 @@
             <div id="log-history"></div>
         </section>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
