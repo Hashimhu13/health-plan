@@ -1,3 +1,130 @@
+// ========== منطق صفحة الوجبات والسعرات (meals page) ==========
+function updateMealsPageFoodUnit() {
+    const foodType = document.getElementById('meals-page-food-type').value;
+    let foods = JSON.parse(localStorage.getItem('foods') || '[]');
+    let food = foods.find(f => f.name === foodType);
+    document.getElementById('meals-page-food-unit').textContent = food ? food.unit : '';
+    const foodList = document.getElementById('food-list');
+    foodList.innerHTML = '';
+    foods.forEach(f => {
+        let div = document.createElement('div');
+        div.textContent = `${f.name} - ${f.calories} كالوري (${f.unit})`;
+        foodList.appendChild(div);
+    });
+}
+
+function updateMealsPageMealCalories() {
+    const foodType = document.getElementById('meals-page-food-type').value;
+    const amount = parseFloat(document.getElementById('meals-page-food-amount').value) || 0;
+    let foods = JSON.parse(localStorage.getItem('foods') || '[]');
+    let food = foods.find(f => f.name === foodType);
+    if (food) {
+        let cal = Math.round((food.calories * amount) / 100);
+        document.getElementById('meals-page-meal-calories').value = cal;
+    } else {
+        document.getElementById('meals-page-meal-calories').value = '';
+    }
+}
+
+function updateMealsPageFoodTypeSelect() {
+    let foods = JSON.parse(localStorage.getItem('foods') || '[]');
+    const select = document.getElementById('meals-page-food-type');
+    select.innerHTML = '';
+    foods.forEach(f => {
+        let opt = document.createElement('option');
+        opt.value = f.name;
+        opt.textContent = f.name;
+        select.appendChild(opt);
+    });
+    if (foods.length > 0) {
+        select.value = foods[0].name;
+    }
+    updateMealsPageFoodUnit();
+    updateMealsPageMealCalories();
+}
+
+function loadMealsPage() {
+    let meals = JSON.parse(localStorage.getItem('meals') || '{}');
+    const today = new Date().toISOString().slice(0, 10);
+    let todayMeals = meals[today] || [];
+    let html = '<table><tr><th>الوجبة</th><th>نوع الطعام</th><th>الكمية</th><th>السعرات</th><th>تعديل</th><th>حذف</th></tr>';
+    let total = 0;
+    todayMeals.forEach((m, idx) => {
+        html += `<tr>
+            <td>${m.meal}</td>
+            <td>${m.food}</td>
+            <td>${m.amount}</td>
+            <td>${m.calories}</td>
+            <td><button class="edit-meals-page-btn" data-idx="${idx}">تعديل</button></td>
+            <td><button class="delete-meals-page-btn" data-idx="${idx}">حذف</button></td>
+        </tr>`;
+        total += m.calories;
+    });
+    html += '</table>';
+    document.getElementById('meals-page-list').innerHTML = html;
+    document.getElementById('meals-page-total').innerHTML = `مجموع السعرات اليوم: ${total} كالوري`;
+    // حذف
+    document.querySelectorAll('.delete-meals-page-btn').forEach(btn => {
+        btn.onclick = function() {
+            let meals = JSON.parse(localStorage.getItem('meals') || '{}');
+            const today = new Date().toISOString().slice(0, 10);
+            if (meals[today]) {
+                meals[today].splice(+this.dataset.idx, 1);
+                localStorage.setItem('meals', JSON.stringify(meals));
+                loadMealsPage();
+            }
+        };
+    });
+    // تعديل
+    document.querySelectorAll('.edit-meals-page-btn').forEach(btn => {
+        btn.onclick = function() {
+            let meals = JSON.parse(localStorage.getItem('meals') || '{}');
+            const today = new Date().toISOString().slice(0, 10);
+            const idx = +this.dataset.idx;
+            if (meals[today] && meals[today][idx]) {
+                const m = meals[today][idx];
+                document.getElementById('meals-page-meal-name').value = m.meal;
+                document.getElementById('meals-page-food-type').value = m.food;
+                document.getElementById('meals-page-food-amount').value = m.amount;
+                document.getElementById('meals-page-meal-calories').value = m.calories;
+                document.getElementById('meals-page-form').dataset.editIdx = idx;
+            }
+        };
+    });
+}
+
+// تفعيل النموذج والجدول عند تفعيل صفحة الوجبات والسعرات
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('meals-page-form')) {
+        updateMealsPageFoodTypeSelect();
+        loadMealsPage();
+        document.getElementById('meals-page-food-type').addEventListener('change', function() {
+            updateMealsPageFoodUnit();
+            updateMealsPageMealCalories();
+        });
+        document.getElementById('meals-page-food-amount').addEventListener('input', updateMealsPageMealCalories);
+        document.getElementById('meals-page-form').onsubmit = function(e) {
+            e.preventDefault();
+            const mealName = document.getElementById('meals-page-meal-name').value;
+            const foodType = document.getElementById('meals-page-food-type').value;
+            const amount = parseFloat(document.getElementById('meals-page-food-amount').value) || 0;
+            const mealCalories = parseInt(document.getElementById('meals-page-meal-calories').value) || 0;
+            const today = new Date().toISOString().slice(0, 10);
+            let meals = JSON.parse(localStorage.getItem('meals') || '{}');
+            if (!meals[today]) meals[today] = [];
+            const editIdx = this.dataset.editIdx;
+            if (editIdx !== undefined && editIdx !== "") {
+                meals[today][editIdx] = { meal: mealName, food: foodType, amount, calories: mealCalories };
+                delete this.dataset.editIdx;
+            } else {
+                meals[today].push({ meal: mealName, food: foodType, amount, calories: mealCalories });
+            }
+            localStorage.setItem('meals', JSON.stringify(meals));
+            loadMealsPage();
+            this.reset();
+        };
+    }
+});
 
 // إدارة الجدول اليومي (إضافة/تعديل/حذف)
 function getPlan() {
@@ -141,19 +268,60 @@ function showTodayProgress() {
 window.onload = function() {
     // دمج قائمة أطعمة افتراضية مع أي أطعمة موجودة بدون تكرار
     const defaultFoods = [
-    { name: 'شيبس صغير', calories: 160, unit: 'كيس', unitAmount: 1 },
-    { name: 'شيبس كبير', calories: 300, unit: 'كيس', unitAmount: 1 },
-    { name: 'فشار', calories: 90, unit: 'كوب', unitAmount: 1 },
-    { name: 'كتكات', calories: 210, unit: 'قطعة', unitAmount: 1 },
-    { name: 'مارس', calories: 230, unit: 'قطعة', unitAmount: 1 },
-    { name: 'سنيكرز', calories: 250, unit: 'قطعة', unitAmount: 1 },
-    { name: 'بسكويت دايجستف', calories: 70, unit: 'قطعة', unitAmount: 1 },
-    { name: 'بسكويت اوريو', calories: 53, unit: 'قطعة', unitAmount: 1 },
-    { name: 'شوكولاتة جالكسي', calories: 220, unit: 'قطعة', unitAmount: 1 },
-    { name: 'عصير برتقال', calories: 110, unit: 'كوب', unitAmount: 1 },
-    { name: 'عصير تفاح', calories: 120, unit: 'كوب', unitAmount: 1 },
-    { name: 'زبادي قليل الدسم', calories: 60, unit: 'علبة', unitAmount: 1 },
-    { name: 'لبن قليل الدسم', calories: 80, unit: 'كوب', unitAmount: 1 },
+        { name: 'كبسة دجاج', calories: 500, unit: '250 جم' },
+        { name: 'مندي لحم', calories: 600, unit: '250 جم' },
+        { name: 'مجبوس دجاج', calories: 520, unit: '250 جم' },
+        { name: 'برياني', calories: 550, unit: '250 جم' },
+        { name: 'رز أبيض مطبوخ', calories: 130, unit: '100 جم' },
+        { name: 'جريش', calories: 350, unit: '200 جم' },
+        { name: 'قرصان', calories: 360, unit: '200 جم' },
+        { name: 'مطازيز', calories: 370, unit: '200 جم' },
+        { name: 'هريس', calories: 330, unit: '200 جم' },
+        { name: 'ثريد', calories: 400, unit: '250 جم' },
+        { name: 'لقيمات', calories: 400, unit: '100 جم' },
+        { name: 'سمبوسة', calories: 120, unit: '1 جم' },
+        { name: 'فول', calories: 110, unit: '100 جم' },
+        { name: 'حمص', calories: 160, unit: '100 جم' },
+        { name: 'تمر', calories: 280, unit: '100 جم' },
+        { name: 'شوربة عدس', calories: 180, unit: '250 جم' },
+        { name: 'شوربة دجاج', calories: 150, unit: '250 جم' },
+        { name: 'سلطة خضراء', calories: 80, unit: '150 جم' },
+        { name: 'قهوة عربية', calories: 5, unit: 'كوب' },
+        { name: 'شاورما دجاج', calories: 500, unit: 'سندويتش' },
+        { name: 'شاورما لحم', calories: 600, unit: 'سندويتش' },
+        { name: 'كباب لحم', calories: 250, unit: '100 جم' },
+        { name: 'كباب دجاج', calories: 200, unit: '100 جم' },
+        { name: 'مشاوي مشكلة', calories: 550, unit: '250 جم' },
+        { name: 'برجر لحم', calories: 700, unit: 'وجبة' },
+        { name: 'برجر دجاج', calories: 600, unit: 'وجبة' },
+        { name: 'بيتزا وسط', calories: 280, unit: 'قطعة' },
+        { name: 'بروستد دجاج', calories: 800, unit: 'وجبة (4 قطع)' },
+        { name: 'فلافل', calories: 330, unit: '100 جم' },
+        // سناكات ومشروبات
+        { name: 'شيبس صغير', calories: 160, unit: 'كيس' },
+        { name: 'شيبس كبير', calories: 300, unit: 'كيس' },
+        { name: 'فشار', calories: 90, unit: 'كوب' },
+        { name: 'كتكات', calories: 210, unit: 'قطعة' },
+        { name: 'مارس', calories: 230, unit: 'قطعة' },
+        { name: 'سنيكرز', calories: 250, unit: 'قطعة' },
+        { name: 'بسكويت دايجستف', calories: 70, unit: 'قطعة' },
+        { name: 'عصير برتقال', calories: 110, unit: 'كوب' },
+        { name: 'عصير تفاح', calories: 120, unit: 'كوب' },
+        { name: 'بيبسي', calories: 150, unit: 'علبة' },
+        { name: 'ماء', calories: 0, unit: 'كوب' },
+        { name: 'شاي', calories: 2, unit: 'كوب' },
+        { name: 'قهوة أمريكية', calories: 5, unit: 'كوب' },
+        { name: 'نسكافيه', calories: 10, unit: 'كوب' },
+        { name: 'حليب قليل الدسم', calories: 60, unit: 'كوب' },
+        { name: 'زبادي', calories: 80, unit: 'كوب' },
+        { name: 'لبن', calories: 60, unit: 'كوب' },
+        { name: 'ماء غازي', calories: 0, unit: 'كوب' },
+        { name: 'بسكويت اوريو', calories: 53, unit: 'قطعة', unitAmount: 1 },
+        { name: 'شوكولاتة جالكسي', calories: 220, unit: 'قطعة', unitAmount: 1 },
+        { name: 'عصير برتقال', calories: 110, unit: 'كوب', unitAmount: 1 },
+        { name: 'عصير تفاح', calories: 120, unit: 'كوب', unitAmount: 1 },
+        { name: 'زبادي قليل الدسم', calories: 60, unit: 'علبة', unitAmount: 1 },
+        { name: 'لبن قليل الدسم', calories: 80, unit: 'كوب', unitAmount: 1 },
         { name: 'كبسة دجاج', calories: 500, unit: 'جم', unitAmount: 250 },
         { name: 'مندي لحم', calories: 600, unit: 'جم', unitAmount: 250 },
         { name: 'مجبوس دجاج', calories: 520, unit: 'جم', unitAmount: 250 },
