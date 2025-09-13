@@ -358,14 +358,15 @@ window.onload = function() {
         if (!foods.some(f => f.name === df.name)) foods.push(df);
     });
     localStorage.setItem('foods', JSON.stringify(foods));
-    // تفعيل التنقل الجانبي
+    // تفعيل التنقل العلوي (dropdown)
     function showSection(section) {
         document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
         document.getElementById('section-' + section).classList.add('active');
-        document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
-        document.querySelector('.sidebar-link[data-section="' + section + '"]').classList.add('active');
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.nav-link[data-section="' + section + '"]');
+        if (activeLink) activeLink.classList.add('active');
     }
-    document.querySelectorAll('.sidebar-link').forEach(link => {
+    document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
             showSection(this.dataset.section);
@@ -605,38 +606,44 @@ function updateHomeSummary() {
     let targetCalories = 2000;
     if (personal.targetCalories) targetCalories = parseInt(personal.targetCalories);
     let calPercent = Math.min(Math.round((total / targetCalories) * 100), 100);
-    let ctx = document.getElementById('home-circle-chart').getContext('2d');
-    if (window.homeChart) window.homeChart.destroy();
-    window.homeChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['نسبة الالتزام', 'السعرات المستهلكة من الهدف'],
-            datasets: [
-                {
-                    label: 'نسبة الالتزام',
-                    data: [percent, 100 - percent],
-                    backgroundColor: ['#1976d2', '#e3f2fd'],
-                    borderWidth: 2,
-                    cutout: '60%',
-                    radius: '75%'
-                },
-                {
-                    label: 'السعرات',
-                    data: [calPercent, 100 - calPercent],
-                    backgroundColor: ['#ff9800', '#ffe0b2'],
-                    borderWidth: 2,
-                    cutout: '0%',
-                    radius: '59%'
+    const chartCanvas = document.getElementById('home-circle-chart');
+    if (chartCanvas && window.Chart && chartCanvas.getContext) {
+        let ctx = chartCanvas.getContext('2d');
+        if (window.homeChart) window.homeChart.destroy();
+        window.homeChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['نسبة الالتزام', 'السعرات المستهلكة من الهدف'],
+                datasets: [
+                    {
+                        label: 'نسبة الالتزام',
+                        data: [percent, 100 - percent],
+                        backgroundColor: ['#1976d2', '#e3f2fd'],
+                        borderWidth: 2,
+                        cutout: '60%',
+                        radius: '75%'
+                    },
+                    {
+                        label: 'السعرات',
+                        data: [calPercent, 100 - calPercent],
+                        backgroundColor: ['#ff9800', '#ffe0b2'],
+                        borderWidth: 2,
+                        cutout: '0%',
+                        radius: '59%'
+                    }
+                ]
+            },
+            options: {
+                plugins: {
+                    legend: { display: true, position: 'bottom' },
+                    tooltip: { enabled: true }
                 }
-            ]
-        },
-        options: {
-            plugins: {
-                legend: { display: true, position: 'bottom' },
-                tooltip: { enabled: true }
             }
-        }
-    });
+        });
+    } else {
+        // fallback: hide chart or show error
+        if (chartCanvas) chartCanvas.style.display = 'none';
+    }
 
     // جدول تتبع الخطة الصحية اليومية
     let table = '<table><thead><tr><th>الوقت</th><th>النشاط</th><th>تم الإنجاز؟</th></tr></thead><tbody>';
@@ -732,10 +739,40 @@ function loadPersonalSummary() {
 function loadLogHistory() {
     let logs = JSON.parse(localStorage.getItem('logs') || '{}');
     let days = Object.keys(logs).slice(-7).reverse();
-    let html = '<table><tr><th>اليوم</th><th>الوزن</th><th>ملاحظة</th></tr>';
+    let html = '<table><tr><th>اليوم</th><th>الوزن</th><th>ملاحظة</th><th>تعديل</th><th>حذف</th></tr>';
     days.forEach(day => {
-        html += `<tr><td>${day}</td><td>${logs[day].weight || ''}</td><td>${logs[day].note || ''}</td></tr>`;
+        html += `<tr>
+            <td>${day}</td>
+            <td>${logs[day].weight || ''}</td>
+            <td>${logs[day].note || ''}</td>
+            <td><button class="edit-log-btn" data-day="${day}">تعديل</button></td>
+            <td><button class="delete-log-btn" data-day="${day}">حذف</button></td>
+        </tr>`;
     });
     html += '</table>';
     document.getElementById('log-history').innerHTML = html;
+
+    // Add event listeners for edit and delete
+    document.querySelectorAll('.edit-log-btn').forEach(btn => {
+        btn.onclick = function() {
+            let logs = JSON.parse(localStorage.getItem('logs') || '{}');
+            let day = this.dataset.day;
+            if (logs[day]) {
+                document.getElementById('weight').value = logs[day].weight || '';
+                document.getElementById('note').value = logs[day].note || '';
+                document.getElementById('log-form').dataset.editDay = day;
+            }
+        };
+    });
+    document.querySelectorAll('.delete-log-btn').forEach(btn => {
+        btn.onclick = function() {
+            let logs = JSON.parse(localStorage.getItem('logs') || '{}');
+            let day = this.dataset.day;
+            if (logs[day]) {
+                delete logs[day];
+                localStorage.setItem('logs', JSON.stringify(logs));
+                loadLogHistory();
+            }
+        };
+    });
 }

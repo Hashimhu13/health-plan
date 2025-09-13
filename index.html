@@ -7,50 +7,19 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <button class="sidebar-toggle" id="sidebar-toggle" aria-label="إظهار القائمة">☰</button>
-    <div class="sidebar" id="sidebar">
-        <ul>
-            <li><a href="#" data-section="home" class="sidebar-link active">الرئيسية</a></li>
-            <li><a href="#" data-section="plan" class="sidebar-link">الجدول اليومي</a></li>
-            <li><a href="#" data-section="meals" class="sidebar-link">الوجبات والسعرات</a></li>
-            <li><a href="#" data-section="progress" class="sidebar-link">تتبع الالتزام</a></li>
-            <li><a href="#" data-section="log" class="sidebar-link">سجل الوزن والملاحظات</a></li>
-            <li><a href="#" data-section="personal" class="sidebar-link">البيانات الشخصية</a></li>
-        </ul>
-    </div>
-<script>
-// إظهار/إخفاء القائمة الجانبية في الجوال
-document.addEventListener('DOMContentLoaded', function() {
-    var sidebar = document.getElementById('sidebar');
-    var toggle = document.getElementById('sidebar-toggle');
-    function checkMobile() {
-        if (window.innerWidth <= 900) {
-            sidebar.classList.add('mobile');
-            sidebar.style.display = 'none';
-            toggle.style.display = 'block';
-        } else {
-            sidebar.classList.remove('mobile');
-            sidebar.style.display = '';
-            toggle.style.display = 'none';
-        }
-    }
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    toggle.addEventListener('click', function() {
-        if (sidebar.style.display === 'block') {
-            sidebar.style.display = 'none';
-        } else {
-            sidebar.style.display = 'block';
-        }
-    });
-    // إخفاء القائمة عند اختيار عنصر
-    sidebar.querySelectorAll('.sidebar-link').forEach(function(link) {
-        link.addEventListener('click', function() {
-            if (window.innerWidth <= 900) sidebar.style.display = 'none';
-        });
-    });
-});
-</script>
+    <nav class="topnav" id="topnav">
+        <div class="dropdown">
+            <button class="dropbtn">القائمة ▾</button>
+            <div class="dropdown-content">
+                <a href="#" data-section="home" class="nav-link active">الرئيسية</a>
+                <a href="#" data-section="plan" class="nav-link">الجدول اليومي</a>
+                <a href="#" data-section="meals" class="nav-link">الوجبات والسعرات</a>
+                <a href="#" data-section="progress" class="nav-link">تتبع الالتزام</a>
+                <a href="#" data-section="log" class="nav-link">سجل الوزن والملاحظات</a>
+                <a href="#" data-section="personal" class="nav-link">البيانات الشخصية</a>
+            </div>
+        </div>
+    </nav>
     <div class="container">
     <section class="home-section section" id="section-home">
             <div id="home-greeting" style="font-size:1.3rem;margin-bottom:8px;"></div>
