@@ -447,17 +447,20 @@ window.onload = function() {
     });
     // سجل الوزن والملاحظات
     loadLogHistory();
-    document.getElementById('log-form').onsubmit = function(e) {
-        e.preventDefault();
-        const weight = document.getElementById('weight').value;
-        const note = document.getElementById('note').value;
-        const today = new Date().toISOString().slice(0, 10);
-        let logs = JSON.parse(localStorage.getItem('logs') || '{}');
-        logs[today] = { weight, note };
-        localStorage.setItem('logs', JSON.stringify(logs));
-        loadLogHistory();
-        this.reset();
-    };
+    var logForm = document.getElementById('log-form');
+    if (logForm) {
+        logForm.onsubmit = function(e) {
+            e.preventDefault();
+            const weight = document.getElementById('weight').value;
+            const note = document.getElementById('note').value;
+            const today = new Date().toISOString().slice(0, 10);
+            let logs = JSON.parse(localStorage.getItem('logs') || '{}');
+            logs[today] = { weight, note };
+            localStorage.setItem('logs', JSON.stringify(logs));
+            loadLogHistory();
+            this.reset();
+        };
+    }
 
     // إدارة أنواع الطعام
     loadFoodTypes();
