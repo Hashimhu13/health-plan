@@ -1,3 +1,4 @@
+
 // ========== منطق صفحة الوجبات والسعرات (meals page) ==========
 function updateMealsPageFoodUnit() {
     const foodType = document.getElementById('meals-page-food-type').value;
@@ -92,6 +93,7 @@ function loadMealsPage() {
         };
     });
 }
+
 
 // تفعيل النموذج والجدول عند تفعيل صفحة الوجبات والسعرات
 document.addEventListener('DOMContentLoaded', function() {
@@ -264,8 +266,7 @@ function showTodayProgress() {
     document.getElementById('today-progress').innerHTML = `<strong>نسبة الالتزام اليوم: ${percent}%</strong>`;
 }
 
-// الأحداث
-window.onload = function() {
+// الأحداث: كل منطق DOM داخل DOMContentLoaded فقط
     // دمج قائمة أطعمة افتراضية مع أي أطعمة موجودة بدون تكرار
     const defaultFoods = [
         { name: 'كبسة دجاج', calories: 500, unit: '250 جم' },
@@ -463,37 +464,17 @@ window.onload = function() {
                 this.reset();
             };
         }
+
     });
 
-    // إدارة أنواع الطعام
-    loadFoodTypes();
-    updateFoodTypeSelect();
-    document.getElementById('food-form').onsubmit = function(e) {
-        e.preventDefault();
-        const name = document.getElementById('new-food-name').value.trim();
-        const calories = parseInt(document.getElementById('new-food-calories').value) || 0;
-        const unit = document.getElementById('new-food-unit').value.trim() || 'جم';
-        if (!name || !calories) return;
-        let foods = JSON.parse(localStorage.getItem('foods') || '[]');
-        // منع التكرار
-        if (foods.some(f => f.name === name)) return;
-        foods.push({ name, calories, unit });
-        localStorage.setItem('foods', JSON.stringify(foods));
-        loadFoodTypes();
-        updateFoodTypeSelect();
-        // تحديث الوحدة والسعرات في النموذج
-        document.getElementById('food-type').value = name;
-        updateFoodUnit();
-        updateMealCalories();
-        this.reset();
-    };
-
-    // تحديث الوحدة عند تغيير نوع الطعام
-    document.getElementById('food-type').addEventListener('change', function() {
-        updateFoodUnit();
-        updateMealCalories();
-    });
-    document.getElementById('food-amount').addEventListener('input', updateMealCalories);
+// إدارة أنواع الطعام
+loadFoodTypes();
+updateFoodTypeSelect();
+document.getElementById('food-type').addEventListener('change', function() {
+    updateFoodUnit();
+    updateMealCalories();
+});
+document.getElementById('food-amount').addEventListener('input', updateMealCalories);
 
     // تحديث السعرات تلقائياً عند تغيير الكمية أو نوع الطعام
     function updateMealCalories() {
@@ -548,30 +529,25 @@ window.onload = function() {
 
     // تسجيل الوجبات اليومية والسعرات
     loadMeals();
-    document.getElementById('meal-form').onsubmit = function(e) {
-        e.preventDefault();
-        const mealName = document.getElementById('meal-name').value;
-        const foodType = document.getElementById('food-type').value;
-        const amount = parseFloat(document.getElementById('food-amount').value) || 0;
-        const mealCalories = parseInt(document.getElementById('meal-calories').value) || 0;
-        const today = new Date().toISOString().slice(0, 10);
-        let meals = JSON.parse(localStorage.getItem('meals') || '{}');
-        if (!meals[today]) meals[today] = [];
-        // تعديل إذا كان editIdx موجود
-        const editIdx = this.dataset.editIdx;
-        if (editIdx !== undefined && editIdx !== "") {
-            meals[today][editIdx] = { meal: mealName, food: foodType, amount, calories: mealCalories };
-            delete this.dataset.editIdx;
-        } else {
-            meals[today].push({ meal: mealName, food: foodType, amount, calories: mealCalories });
-        }
-        localStorage.setItem('meals', JSON.stringify(meals));
-        loadMeals();
-        this.reset();
-    };
+    var foodForm = document.getElementById('food-form');
+    if (foodForm) {
+        foodForm.onsubmit = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-food-name').value.trim();
+            const calories = parseInt(document.getElementById('new-food-calories').value) || 0;
+            const unit = document.getElementById('new-food-unit').value.trim() || 'جم';
+            if (!name || !calories) return;
+            let foods = JSON.parse(localStorage.getItem('foods') || '[]');
+            // منع التكرار
+            if (foods.some(f => f.name === name)) return;
+            foods.push({ name, calories, unit });
+            localStorage.setItem('foods', JSON.stringify(foods));
+            updateFoodTypeSelect();
+            this.reset();
+        };
+    }
     // تحديث ملخص الصفحة الرئيسية
     updateHomeSummary();
-};
 
 // ملخص الصفحة الرئيسية: سجل اليوم والسعرات
 function updateHomeSummary() {
