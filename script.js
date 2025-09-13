@@ -352,115 +352,118 @@ window.onload = function() {
         { name: 'بروستد دجاج', calories: 800, unit: 'وجبة (4 قطع)', unitAmount: 1 },
         { name: 'فلافل', calories: 330, unit: 'جم', unitAmount: 100 }
     ];
-    let foods = [];
-    try { foods = JSON.parse(localStorage.getItem('foods') || '[]'); } catch {}
-    defaultFoods.forEach(df => {
-        if (!foods.some(f => f.name === df.name)) foods.push(df);
-    });
-    localStorage.setItem('foods', JSON.stringify(foods));
-    // تفعيل التنقل العلوي (dropdown)
-    function showSection(section) {
-        document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-        document.getElementById('section-' + section).classList.add('active');
-        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-        const activeLink = document.querySelector('.nav-link[data-section="' + section + '"]');
-        if (activeLink) activeLink.classList.add('active');
-    }
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            showSection(this.dataset.section);
-            if (this.dataset.section === 'home') updateHomeSummary();
+    document.addEventListener('DOMContentLoaded', function() {
+        let foods = [];
+        try { foods = JSON.parse(localStorage.getItem('foods') || '[]'); } catch {}
+        defaultFoods.forEach(df => {
+            if (!foods.some(f => f.name === df.name)) foods.push(df);
         });
-    });
-    // إظهار الصفحة الرئيسية افتراضياً
-    showSection('home');
-
-    // تحميل البيانات الشخصية
-    loadPersonalSummary();
-    const personalSection = document.querySelector('.personal-info');
-    const personalForm = document.getElementById('personal-form');
-    const editBtn = document.getElementById('edit-personal-btn');
-    // إخفاء القسم إذا كانت البيانات محفوظة
-    let data = {};
-    try { data = JSON.parse(localStorage.getItem('personal') || '{}'); } catch {}
-    if (data.username) {
-        personalForm.style.display = 'none';
-        editBtn.style.display = 'inline-block';
-    }
-    editBtn.onclick = function() {
-        // إعادة تعبئة النموذج بالبيانات القديمة
-        if (data.username) document.getElementById('username').value = data.username;
-        if (data.birthdate) document.getElementById('birthdate').value = data.birthdate;
-        if (data.workStart) document.getElementById('work-start').value = data.workStart;
-        if (data.workEnd) document.getElementById('work-end').value = data.workEnd;
-        if (Array.isArray(data.workdays)) {
-            document.querySelectorAll('input[name="workdays"]').forEach(cb => {
-                cb.checked = data.workdays.includes(cb.value);
+        localStorage.setItem('foods', JSON.stringify(foods));
+        // تفعيل التنقل العلوي (dropdown)
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById('section-' + section).classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            const activeLink = document.querySelector('.nav-link[data-section="' + section + '"]');
+            if (activeLink) activeLink.classList.add('active');
+        }
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection(this.dataset.section);
+                if (this.dataset.section === 'home' && document.getElementById('home-circle-chart')) updateHomeSummary();
             });
-        }
-        personalForm.style.display = 'block';
-        editBtn.style.display = 'none';
-    };
-    personalForm.onsubmit = function(e) {
-        e.preventDefault();
-        const username = document.getElementById('username').value;
-        const birthdate = document.getElementById('birthdate').value;
-        const workStart = document.getElementById('work-start').value;
-        const workEnd = document.getElementById('work-end').value;
-        const workdays = Array.from(document.querySelectorAll('input[name="workdays"]:checked')).map(cb => cb.value);
-        const data = { username, birthdate, workStart, workEnd, workdays };
-        localStorage.setItem('personal', JSON.stringify(data));
-        loadPersonalSummary();
-        personalForm.style.display = 'none';
-        editBtn.style.display = 'inline-block';
-        return false;
-    };
-    loadPlan();
-    // إضافة/تعديل نشاط في الجدول اليومي
-    document.getElementById('plan-form').onsubmit = function(e) {
-        e.preventDefault();
-        let plan = getPlan();
-        const activity = document.getElementById('plan-activity').value.trim();
-        const start = document.getElementById('plan-start').value;
-        const end = document.getElementById('plan-end').value;
-        const editIdx = this.dataset.editIdx;
-        if (editIdx !== undefined && editIdx !== "") {
-            plan[+editIdx] = { activity, start, end };
-            this.dataset.editIdx = "";
-        } else {
-            plan.push({ activity, start, end });
-        }
-        savePlan(plan);
-        loadPlan();
-        this.reset();
-    };
-    loadProgress();
-    showWeeklyProgress();
-    showTodayProgress();
-    document.querySelectorAll('.done-checkbox').forEach(cb => {
-        cb.addEventListener('change', () => {
-            saveProgress();
-            showWeeklyProgress();
-            showTodayProgress();
         });
-    });
-    // سجل الوزن والملاحظات
-    loadLogHistory();
-    var logForm = document.getElementById('log-form');
-    if (logForm) {
-        logForm.onsubmit = function(e) {
+        // إظهار الصفحة الرئيسية افتراضياً
+        showSection('home');
+        if (document.getElementById('home-circle-chart')) updateHomeSummary();
+
+        // تحميل البيانات الشخصية
+        loadPersonalSummary();
+        const personalSection = document.querySelector('.personal-info');
+        const personalForm = document.getElementById('personal-form');
+        const editBtn = document.getElementById('edit-personal-btn');
+        // إخفاء القسم إذا كانت البيانات محفوظة
+        let data = {};
+        try { data = JSON.parse(localStorage.getItem('personal') || '{}'); } catch {}
+        if (data.username) {
+            personalForm.style.display = 'none';
+            editBtn.style.display = 'inline-block';
+        }
+        editBtn.onclick = function() {
+            // إعادة تعبئة النموذج بالبيانات القديمة
+            if (data.username) document.getElementById('username').value = data.username;
+            if (data.birthdate) document.getElementById('birthdate').value = data.birthdate;
+            if (data.workStart) document.getElementById('work-start').value = data.workStart;
+            if (data.workEnd) document.getElementById('work-end').value = data.workEnd;
+            if (Array.isArray(data.workdays)) {
+                document.querySelectorAll('input[name="workdays"]').forEach(cb => {
+                    cb.checked = data.workdays.includes(cb.value);
+                });
+            }
+            personalForm.style.display = 'block';
+            editBtn.style.display = 'none';
+        };
+        personalForm.onsubmit = function(e) {
             e.preventDefault();
-            const weight = document.getElementById('weight').value;
-            const note = document.getElementById('note').value;
-            const today = new Date().toISOString().slice(0, 10);
-            let logs = JSON.parse(localStorage.getItem('logs') || '{}');
-            logs[today] = { weight, note };
-            localStorage.setItem('logs', JSON.stringify(logs));
-            loadLogHistory();
+            const username = document.getElementById('username').value;
+            const birthdate = document.getElementById('birthdate').value;
+            const workStart = document.getElementById('work-start').value;
+            const workEnd = document.getElementById('work-end').value;
+            const workdays = Array.from(document.querySelectorAll('input[name="workdays"]:checked')).map(cb => cb.value);
+            const data = { username, birthdate, workStart, workEnd, workdays };
+            localStorage.setItem('personal', JSON.stringify(data));
+            loadPersonalSummary();
+            personalForm.style.display = 'none';
+            editBtn.style.display = 'inline-block';
+            return false;
+        };
+        loadPlan();
+        // إضافة/تعديل نشاط في الجدول اليومي
+        document.getElementById('plan-form').onsubmit = function(e) {
+            e.preventDefault();
+            let plan = getPlan();
+            const activity = document.getElementById('plan-activity').value.trim();
+            const start = document.getElementById('plan-start').value;
+            const end = document.getElementById('plan-end').value;
+            const editIdx = this.dataset.editIdx;
+            if (editIdx !== undefined && editIdx !== "") {
+                plan[+editIdx] = { activity, start, end };
+                this.dataset.editIdx = "";
+            } else {
+                plan.push({ activity, start, end });
+            }
+            savePlan(plan);
+            loadPlan();
             this.reset();
         };
-    }
+        loadProgress();
+        showWeeklyProgress();
+        showTodayProgress();
+        document.querySelectorAll('.done-checkbox').forEach(cb => {
+            cb.addEventListener('change', () => {
+                saveProgress();
+                showWeeklyProgress();
+                showTodayProgress();
+            });
+        });
+        // سجل الوزن والملاحظات
+        loadLogHistory();
+        var logForm = document.getElementById('log-form');
+        if (logForm) {
+            logForm.onsubmit = function(e) {
+                e.preventDefault();
+                const weight = document.getElementById('weight').value;
+                const note = document.getElementById('note').value;
+                const today = new Date().toISOString().slice(0, 10);
+                let logs = JSON.parse(localStorage.getItem('logs') || '{}');
+                logs[today] = { weight, note };
+                localStorage.setItem('logs', JSON.stringify(logs));
+                loadLogHistory();
+                this.reset();
+            };
+        }
+    });
 
     // إدارة أنواع الطعام
     loadFoodTypes();
