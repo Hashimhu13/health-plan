@@ -97,6 +97,32 @@ function loadMealsPage() {
 
 // تفعيل النموذج والجدول عند تفعيل صفحة الوجبات والسعرات
 document.addEventListener('DOMContentLoaded', function() {
+    // تفعيل نموذج إضافة وجبة في الصفحة الرئيسية
+    var homeMealForm = document.getElementById('meal-form');
+    if (homeMealForm) {
+        homeMealForm.onsubmit = function(e) {
+            e.preventDefault();
+            const mealName = document.getElementById('meal-name').value;
+            const foodType = document.getElementById('food-type').value;
+            const amount = parseFloat(document.getElementById('food-amount').value) || 0;
+            const mealCalories = parseInt(document.getElementById('meal-calories').value) || 0;
+            const today = new Date().toISOString().slice(0, 10);
+            let meals = JSON.parse(localStorage.getItem('meals') || '{}');
+            if (!meals[today]) meals[today] = [];
+            const editIdx = this.dataset.editIdx;
+            if (editIdx !== undefined && editIdx !== "") {
+                meals[today][editIdx] = { meal: mealName, food: foodType, amount, calories: mealCalories };
+                delete this.dataset.editIdx;
+            } else {
+                meals[today].push({ meal: mealName, food: foodType, amount, calories: mealCalories });
+            }
+            localStorage.setItem('meals', JSON.stringify(meals));
+            // تحديث القائمة والملخص
+            if (typeof loadMeals === 'function') loadMeals();
+            if (typeof updateHomeSummary === 'function') updateHomeSummary();
+            this.reset();
+        };
+    }
     if (document.getElementById('meals-page-form')) {
         updateMealsPageFoodTypeSelect();
         loadMealsPage();
