@@ -7,12 +7,11 @@ function updateMealsPageFoodUnit() {
     document.getElementById('meals-page-food-unit').textContent = food ? food.unit : '';
     const foodList = document.getElementById('food-list');
     foodList.innerHTML = '';
-    foods.forEach(f => {
-        let div = document.createElement('div');
-        div.textContent = `${f.name} - ${f.calories} كالوري (${f.unit})`;
-        foodList.appendChild(div);
-    });
-}
+	foods.forEach(f => {
+		let div = document.createElement('div');
+		div.textContent = `${f.name} - ${f.calories} كالوري (${f.unit})`;
+		foodList.appendChild(div);
+	});
 
 function updateMealsPageMealCalories() {
     const foodType = document.getElementById('meals-page-food-type').value;
@@ -395,15 +394,40 @@ function showTodayProgress() {
             if (activeLink) activeLink.classList.add('active');
         }
         document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                showSection(this.dataset.section);
-                if (this.dataset.section === 'home' && document.getElementById('home-circle-chart')) updateHomeSummary();
-            });
+
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection(this.dataset.section);
+            if (this.dataset.section === 'home' && document.getElementById('home-circle-chart')) updateHomeSummary();
+            // إخفاء القائمة المنسدلة بعد النقر (للموبايل/ديسكتوب)
+            var dropdownContent = document.querySelector('.dropdown-content');
+            if (dropdownContent) dropdownContent.style.display = 'none';
         });
-        // إظهار الصفحة الرئيسية افتراضياً
-        showSection('home');
-        if (document.getElementById('home-circle-chart')) updateHomeSummary();
+    });
+
+    // دعم إظهار/إخفاء القائمة المنسدلة عند النقر على زر القائمة (للموبايل)
+    var dropBtn = document.querySelector('.dropbtn');
+    var dropdownContent = document.querySelector('.dropdown-content');
+    if (dropBtn && dropdownContent) {
+        dropBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (dropdownContent.style.display === 'block') {
+                dropdownContent.style.display = 'none';
+            } else {
+                dropdownContent.style.display = 'block';
+            }
+        });
+        // إخفاء القائمة عند النقر خارجها
+        document.addEventListener('click', function(e) {
+            if (!dropdownContent.contains(e.target) && e.target !== dropBtn) {
+                dropdownContent.style.display = 'none';
+            }
+        });
+    }
+
+    // إظهار الصفحة الرئيسية افتراضياً
+    showSection('home');
+    if (document.getElementById('home-circle-chart')) updateHomeSummary();
 
         // تحميل البيانات الشخصية
         loadPersonalSummary();
@@ -491,7 +515,6 @@ function showTodayProgress() {
             };
         }
 
-    });
 
 // إدارة أنواع الطعام
 loadFoodTypes();
@@ -783,4 +806,53 @@ function loadLogHistory() {
             }
         };
     });
+// ...existing code...
+
+// Utility functions should be at top level, not inside DOMContentLoaded
+function updateMealCalories() {
+    const foodType = document.getElementById('food-type').value;
+    const amount = parseFloat(document.getElementById('food-amount').value) || 0;
+    let foods = JSON.parse(localStorage.getItem('foods') || '[]');
+    let food = foods.find(f => f.name === foodType);
+    if (food) {
+        let cal = Math.round((food.calories * amount) / 100);
+        document.getElementById('meal-calories').value = cal;
+    } else {
+        document.getElementById('meal-calories').value = '';
+    }
+}
+
+function updateFoodUnit() {
+    const foodType = document.getElementById('food-type').value;
+    let foods = JSON.parse(localStorage.getItem('foods') || '[]');
+    let food = foods.find(f => f.name === foodType);
+    document.getElementById('food-unit').textContent = food ? food.unit : '';
+}
+
+function updateFoodTypeSelect() {
+    let foods = JSON.parse(localStorage.getItem('foods') || '[]');
+    const select = document.getElementById('food-type');
+    select.innerHTML = '';
+    foods.forEach(f => {
+        let opt = document.createElement('option');
+        opt.value = f.name;
+        opt.textContent = f.name;
+        select.appendChild(opt);
+    });
+    // تحديد أول عنصر تلقائياً إذا كان موجوداً
+    if (foods.length > 0) {
+        select.value = foods[0].name;
+    }
+    updateFoodUnit();
+    updateMealCalories();
+}
+
+function loadFoodTypes() {
+    let foods = JSON.parse(localStorage.getItem('foods') || '[]');
+    let html = '<table><tr><th>الطعام</th><th>سعرات لكل 100</th><th>الوحدة</th></tr>';
+    foods.forEach(f => {
+        html += `<tr><td>${f.name}</td><td>${f.calories}</td><td>${f.unit}</td></tr>`;
+    });
+    html += '</table>';
+    document.getElementById('food-list').innerHTML = html;
 }
