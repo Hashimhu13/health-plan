@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متتبع خطة إنقاص الوزن</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4a90e2">
+    <meta name="description" content="تطبيق شامل لتتبع خطة إنقاص الوزن مع حاسبة السعرات الحرارية">
+    <meta name="keywords" content="إنقاص الوزن, دايت, تتبع الوزن, حاسبة السعرات, صحة">
+    <meta property="og:title" content="متتبع خطة إنقاص الوزن">
+    <meta property="og:description" content="تطبيق شامل لتتبع خطة إنقاص الوزن">
+    <meta property="og:type" content="website">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-heartbeat"></i> متتبع خطة إنقاص الوزن</h1>
+            <p>تتبع التزامك بالخطة الغذائية والرياضية</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="showTab('plan')">
+                <i class="fas fa-calendar-alt"></i> الخطة الأسبوعية
+            </button>
+            <button class="tab-btn" onclick="showTab('progress')">
+                <i class="fas fa-chart-line"></i> تتبع التقدم
+            </button>
+            <button class="tab-btn" onclick="showTab('weight')">
+                <i class="fas fa-weight"></i> تسجيل الوزن
+            </button>
+            <button class="tab-btn" onclick="showTab('notes')">
+                <i class="fas fa-sticky-note"></i> الملاحظات
+            </button>
+            <button class="tab-btn" onclick="showTab('calculator')">
+                <i class="fas fa-calculator"></i> حاسبة السعرات
+            </button>
+        </nav>
+
+        <!-- الخطة الأسبوعية -->
+        <div id="plan" class="tab-content active">
+            <div class="week-selector">
+                <label for="weekSelect">اختر الأسبوع:</label>
+                <select id="weekSelect" onchange="loadWeekPlan()">
+                    <option value="1">الأسبوع 1</option>
+                    <option value="2">الأسبوع 2</option>
+                    <option value="3">الأسبوع 3</option>
+                    <option value="4">الأسبوع 4</option>
+                </select>
+            </div>
+
+            <div id="weekPlan" class="week-plan">
+                <!-- سيتم ملء هذا القسم بـ JavaScript -->
+            </div>
+        </div>
+
+        <!-- تتبع التقدم -->
+        <div id="progress" class="tab-content">
+            <div class="progress-section">
+                <h2>إحصائيات التقدم</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>الأيام المكتملة</h3>
+                        <span id="completedDays">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-fire"></i>
+                        <h3>متوسط السعرات اليومية</h3>
+                        <span id="avgCalories">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-dumbbell"></i>
+                        <h3>أيام الرياضة</h3>
+                        <span id="exerciseDays">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>تغيير الوزن</h3>
+                        <span id="weightChange">0 كجم</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="weekly-progress">
+                <h3>التقدم الأسبوعي</h3>
+                <div id="weeklyChart" class="chart-container">
+                    <!-- سيتم إضافة الرسم البياني هنا -->
+                </div>
+            </div>
+        </div>
+
+        <!-- تسجيل الوزن -->
+        <div id="weight" class="tab-content">
+            <div class="weight-section">
+                <h2>تسجيل الوزن</h2>
+                <div class="weight-input">
+                    <label for="weightDate">التاريخ:</label>
+                    <input type="date" id="weightDate">
+                    <label for="weightValue">الوزن (كجم):</label>
+                    <input type="number" id="weightValue" step="0.1" placeholder="أدخل وزنك">
+                    <button onclick="addWeight()">إضافة</button>
+                </div>
+
+                <div class="weight-history">
+                    <h3>تاريخ الوزن</h3>
+                    <div id="weightList" class="weight-list">
+                        <!-- سيتم ملء قائمة الأوزان هنا -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- الملاحظات -->
+        <div id="notes" class="tab-content">
+            <div class="notes-section">
+                <h2>الملاحظات اليومية</h2>
+                <div class="note-input">
+                    <label for="noteDate">التاريخ:</label>
+                    <input type="date" id="noteDate">
+                    <label for="noteText">الملاحظة:</label>
+                    <textarea id="noteText" placeholder="اكتب ملاحظاتك هنا..."></textarea>
+                    <button onclick="addNote()">إضافة ملاحظة</button>
+                </div>
+
+                <div class="notes-history">
+                    <h3>الملاحظات السابقة</h3>
+                    <div id="notesList" class="notes-list">
+                        <!-- سيتم ملء الملاحظات هنا -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- حاسبة السعرات -->
+        <div id="calculator" class="tab-content">
+            <div class="calculator-section">
+                <h2>حاسبة السعرات الحرارية</h2>
+                
+                <div class="meal-builder">
+                    <h3>بناء الوجبة</h3>
+                    <div class="food-search">
+                        <input type="text" id="foodSearch" placeholder="ابحث عن طعام...">
+                        <div id="foodResults" class="food-results"></div>
+                    </div>
+                    
+                    <div class="selected-foods">
+                        <h4>الأطعمة المحددة</h4>
+                        <div id="selectedFoods" class="selected-foods-list"></div>
+                        <div class="total-calories">
+                            <strong>إجمالي السعرات: <span id="totalCalories">0</span> سعرة حرارية</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
